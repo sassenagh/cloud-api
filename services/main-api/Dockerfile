@@ -1,5 +1,7 @@
 FROM python:3.11-slim
 
+RUN useradd -m appuser
+
 WORKDIR /app
 
 ENV PIP_NO_INPUT=1
@@ -12,6 +14,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+USER appuser
 
 EXPOSE 5000
 
