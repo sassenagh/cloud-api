@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: main-api
-  namespace: main-api
 spec:
   replicas: 1
   strategy:
@@ -30,6 +29,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: main-api-config
+            - secretRef:
+                name: main-api-secrets
           resources:
             requests:
               memory: "64Mi"

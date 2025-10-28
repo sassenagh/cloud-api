@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: main-api-config
+data:
+  ENV: "dev"
+  API_VERSION: "v1.0.0"
+  AUX_SERVICE_URL: "http://aux-service.aux-service.svc.cluster.local:5001"
