@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: main-api-config
 data:
-  ENV: "dev"
+  ENV: "prod"
   API_VERSION: "v1.0.0"
   AUX_SERVICE_URL: "http://aux-service.aux-service.svc.cluster.local:5001"

@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  aux-service:
+    build:
+      context: ./services/aux-service
+      dockerfile: Dockerfile
+    container_name: aux-service
+    ports:
+      - "5001:5001"
+    environment:
+      - ENV=${ENV}
+      - SERVICE_NAME=aux-service
+    networks:
+      - backend-network
+
+  main-api:
+    build:
+      context: ./services/main-api
+      dockerfile: Dockerfile
+    container_name: main-api
+    ports:
+      - "5000:5000"
+    environment:
+      - ENV=${ENV}
+      - SERVICE_NAME=main-api
+      - AUX_SERVICE_URL=http://aux-service:5001
+    depends_on:
+      - aux-service
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge

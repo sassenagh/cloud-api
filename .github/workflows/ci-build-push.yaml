@@ -1,0 +1,63 @@
+name: CI/CD - Build & Push to ECR via OIDC
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-west-1
+  MAIN_API_REPO: main-api-repo
+  AUX_SERVICE_REPO: aux-service-repo
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 🔑 AWS authenticacion with OIDC
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 🐳 Login to Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ------------------------------
+      # Build & Push Main API
+      - name: Build and push Main API
+        uses: docker/build-push-action@v6
+        with:
+          context: ./services/main-api
+          file: ./services/main-api/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.MAIN_API_REPO }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.MAIN_API_REPO }}:${{ github.sha }}
+          cache-from: type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ env.MAIN_API_REPO }}:cache
+          cache-to: type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ env.MAIN_API_REPO }}:cache,mode=max
+
+      # ------------------------------
+      # Build & Push Auxiliary Service
+      - name: Build and push Aux Service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./services/aux-service
+          file: ./services/aux-service/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.AUX_SERVICE_REPO }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.AUX_SERVICE_REPO }}:${{ github.sha }}
+          cache-from: type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ env.AUX_SERVICE_REPO }}:cache
+          cache-to: type=registry,ref=${{ steps.login-ecr.outputs.registry }}/${{ env.AUX_SERVICE_REPO }}:cache,mode=max

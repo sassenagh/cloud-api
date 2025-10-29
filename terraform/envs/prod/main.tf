@@ -15,3 +15,11 @@ module "service_accounts" {
   project_name = var.project_name
   environment  = var.environment
 }
+
+module "oidc" {
+  source       = "../../modules/oidc"
+  project_name = var.project_name
+  environment  = var.environment
+  github_user  = "sassenagh"             
+  github_repo  = "cloud-api"      
+}

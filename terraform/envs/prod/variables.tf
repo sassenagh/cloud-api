@@ -1,20 +1,24 @@
-variable "aws_region" {
-  description = "AWS region for this environment"
+variable "project_name" {
   type        = string
-}
-
-variable "aws_profile" {
-  description = "AWS CLI profile to use"
-  type        = string
-  default     = "default"
+  description = "Project name used for resources"
 }
 
 variable "environment" {
-  description = "Environment name (dev, prod, etc.)"
   type        = string
+  description = "Environment name (dev/prod)"
 }
 
-variable "project_name" {
-  description = "Project name"
+variable "aws_region" {
   type        = string
+  description = "AWS region"
 }
+
+variable "aws_profile" {
+  type        = string
+  description = "AWS CLI profile to use"
+  default     = "default"
+}
+
+
+
+
